@@ -32,32 +32,32 @@ app.layout = html.Div([
             'borderStyle': 'dashed',
             'borderRadius': '5px',
             'textAlign': 'center',
-            'margin': '10px auto'  # Center the upload box horizontally
+            'margin': '10px auto'  
         },
-        # Allow multiple files to be uploaded
+        
         multiple=True
     ),
     html.Div(id='output-data-upload'),
 ])
 
 def machine_learning():
-    # Generate synthetic data
+    
     np.random.seed(0)
-    X = 2 * np.random.rand(100, 1)  # Generate 100 random values between 0 and 2
-    y = 4 + 3 * X + np.random.randn(100, 1)  # Generate labels with noise
+    X = 2 * np.random.rand(100, 1) 
+    y = 4 + 3 * X + np.random.randn(100, 1)  
 
-    # Train-test split
+    
     X_train, X_test = X[:80], X[80:]
     y_train, y_test = y[:80], y[80:]
 
-    # Train a linear regression model
+    
     model = LinearRegression()
     model.fit(X_train, y_train)
 
-    # Make predictions
+    
     y_pred = model.predict(X_test)
 
-    # Plot the training data, test data, and the regression line
+    
     # plt.scatter(X_train, y_train, color='blue', label='Training Data')
     # plt.scatter(X_test, y_test, color='red', label='Test Data')
     # plt.plot(X_test, y_pred, color='green', label='Regression Line')
@@ -74,23 +74,23 @@ def parse_contents(contents, filename, date):
     decoded = base64.b64decode(content_string)
     try:
         if 'csv' in filename:
-            # Assume that the user uploaded a CSV file
+            
             df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-            # Categorize purchases based on the 'Category' column
+            
             purchase_categories = df.groupby('Category')['Amount'].sum().reset_index()
-            # Filter out payments and credits from purchase categories
+            
             purchase_categories = purchase_categories[purchase_categories['Category'] != 'Payments and Credits']
-            # Identify repeat purchases by finding duplicates in the 'Description' column
+            
             repeat_purchases = df[df.duplicated(subset='Description')]
-            # Filter out payments and credits from repeat purchases
+        
             repeat_purchases = repeat_purchases[repeat_purchases['Category'] != 'Payments and Credits']
-            # Sort repeat purchases by description
+            
             repeat_purchases = repeat_purchases.sort_values(by='Description')
             
-            # Modify Description to first word
+            
             repeat_purchases['Description'] = repeat_purchases['Description'].str.split().str[0]
         elif 'xls' in filename:
-            # Assume that the user uploaded an excel file
+            
             df = pd.read_excel(io.BytesIO(decoded))
             purchase_categories = df.groupby('Category')['Amount'].sum().reset_index()
             purchase_categories = purchase_categories[purchase_categories['Category'] != 'Payments and Credits']
@@ -98,16 +98,16 @@ def parse_contents(contents, filename, date):
             repeat_purchases = repeat_purchases[repeat_purchases['Category'] != 'Payments and Credits']
             repeat_purchases = repeat_purchases.sort_values(by='Description')
             
-            # Modify Description to first word
+            
             repeat_purchases['Description'] = repeat_purchases['Description'].str.split().str[0]
             
-        # Create stacked bar graph for repeat purchases
+        
         repeat_purchases_fig = px.bar(repeat_purchases, x='Description', y='Amount', color='Category', barmode='stack')
         repeat_purchases_fig.update_layout(title='Repeat Purchases by Category', xaxis_title='Repeat Purchases')
         repeat_purchases_fig.update_xaxes(type='category')
         repeat_purchases_graph = dcc.Graph(id='repeat-purchases-graph', figure=repeat_purchases_fig)
         
-        # Create pie chart for purchase categories
+    
         pie_chart_fig = go.Figure(data=[go.Pie(
             labels=purchase_categories['Category'],
             values=purchase_categories['Amount'],
@@ -120,7 +120,7 @@ def parse_contents(contents, filename, date):
         pie_chart_fig.update_layout(title='Spending Category Proportion', margin=dict(t=50, b=50, r=50, l=50))
         pie_chart = dcc.Graph(id='pie-chart', figure=pie_chart_fig)
         
-        # Create linear graph for purchases through the days
+        
         df['Trans. Date'] = pd.to_datetime(df['Trans. Date'], format='%m/%d/%Y')
         purchases_through_days_fig = px.line(df, x='Trans. Date', y='Amount', title='Purchases Through Days')
         purchases_through_days_graph = dcc.Graph(id='purchases-through-days-graph', figure=purchases_through_days_fig)
@@ -158,7 +158,7 @@ def parse_contents(contents, filename, date):
             ]),
         ]),
 
-        html.Hr(),  # horizontal line
+        html.Hr(),  
         
         html.Div([
             html.H5('Repeat Purchases:'),
@@ -208,7 +208,3 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
 
 if __name__ == '__main__':
      app.run_server(debug=True)
-
-
-
-

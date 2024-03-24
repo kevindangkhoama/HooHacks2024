@@ -1,6 +1,7 @@
+matplotlib
 dash==2.9.3
 numpy
 pandas
-scikit_learn
+scikit-learn
 plotly
 gunicorn
